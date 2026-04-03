@@ -59,31 +59,30 @@
 
     <script>
         // DAFTAR TIM (Sesuaikan dengan tim yang ikut liga Anda)
-        const teams = ["RRQ", "EVOS", "ONIC", "AE", "BTR", "GEEK", "TLID", "DEWA", "NAVI"];
+        const teams = ["RRQ", "AC", "BTRM", "IG", "SRG", "FL", "TR", "VMS"];
 
         // DATA MANUAL - Silakan Edit di Sini
         const matchData = [
             // --- WEEK 1 ---
-            { week: 1, day: "Jumat, 27 Maret 2026", time: "15:15", t1: "BTR", s1: 2, t2: "AE", s2: 1, 
+            { week: 1, day: "Jumat, 3 April 2026", time: "16:00", t1: "SRG", s1: 2, t2: "VMS", s2: 0, 
                 games: [
                     { title: "G1", winner: 1, t1Lineup: ["Shogun (Phoveus)", "Nnael (Leomord)", "Morenooo (Yve)", "Finn (Gloo)", "Emann (Claude)"], t2Lineup: ["(Sora) Nino", "(Uranus) Yazukee", "(Valentina) Hijumee", "(Hylos) Alekk", "(Yi Sun-Shin) Arfy"] },
                     { title: "G2", winner: 2, t1Lineup: ["Shogun (Sora)", "Nnael (Fredrinn)", "Morenooo (Lylia)", "Finn (Khaleed)", "Emann (Granger)"], t2Lineup: ["(Phoveus) Nino", "(Suyou) Yazukee", "(Zetian) Hijumee", "(Marcel) Alekk", "(Obsidia) Arfy"] },
-                    { title: "G3", winner: 1, t1Lineup: ["Shogun (Uranus)", "Nnael (Leomord)", "Morenooo (Yve)", "Finn (Hylos)", "Emann (Freya)"], t2Lineup: ["(Lapu-Lapu) Nino", "(Guinevere) Yazukee", "(Valentina) Hijumee", "(Chou) Alekk", "(Yi Sun-Shin) Arfy"] }
                 ] 
             },
-            { week: 1, day: "Jumat, 27 Maret 2026", time: "18:15", t1: "NAVI", s1: 2, t2: "RRQ", s2: 0, 
+            { week: 1, day: "Jumat, 3 April 2026", time: "19:15", t1: "RRQ", s1: 2, t2: "TR", s2: 0, 
                 games: [
-                    { title: "G1", winner: 1, t1Lineup: ["Karss (Lapu-Lapu)", "Andoryuuu (Leomord)", "Uk1r (Faramis)", "Aprho (Marcel)", "Xyve (Harith)"], t2Lineup: ["(Uranus) SuperDann", "(Fredrinn) SuperKenn", "(Zetian) Rinz", "(Khaleed) Idok", "(Obsidia) SuperToYy"] },
-                    { title: "G2", winner: 1, t1Lineup: ["Karss (Phoveus)", "Andoryuuu (Yi Sun-Shin)", "Uk1r (Lylia)", "Aprho (Belerick)", "Xyve (Harley)"], t2Lineup: ["(Alice) SuperDann", "(Leomord) SuperKenn", "(Valentina) Rinz", "(Marcel) Idok", "(Claude) SuperToYy"] }
+                    { title: "G1", winner: 1, t1Lineup: ["Dyrenn (Sora)", "Garyy (Suyou)", "Kyym (Faramis)", "SUPERYOSHI (Gloo)", "RougH (Karrie)"], t2Lineup: ["(Uranus) SuperDann", "(Fredrinn) SuperKenn", "(Zetian) Rinz", "(Khaleed) Idok", "(Obsidia) SuperToYy"] },
+                    { title: "G2", winner: 1, t1Lineup: ["Dyrenn (Sora)", "Garyy (Suyou)", "Kyym (Valentina)", "SUPERYOSHI (Hylos)", "RougH (Granger)"], t2Lineup: ["(Benedetta) Sizkaa", "(Fredrinn) Just Garrr", "(Kimmy) Martzyyy", "(Hilda) Ivann", "(Yi Sun-Shin) Loleal"] }
                 ] 
             },
-            { week: 1, day: "Sabtu, 28 Maret 2026", time: "14:15", t1: "EVOS", s1: 2, t2: "GEEK", s2: 0, 
+            { week: 1, day: "Sabtu, 4 April 2026", time: "13:30", t1: "IG", s1: null, t2: "BTRM", s2: null, 
                 games: [
                     { title: "G1", winner: 1, t1Lineup: ["Luke (Valentina)", "Alberttt (Fanny)", "Treacky (Selena)", "Kyy (Gatot Kaca)", "Erlan (Claude)"], t2Lineup: ["(Cici) marceL", "(Fredrinn) Maykids", "(Kimmy) A B O Y", "(Hilda) Baloyskie", "(Sora) KennzyySkie"] },
                     { title: "G2", winner: 1, t1Lineup: ["Luke (Masha)", "Alberttt (Fredrinn)", "Treacky (Pharsa)", "Kyy (Chip)", "Erlan (Granger)"], t2Lineup: ["(X.Borg) marceL", "(Suyou) Maykids", "(Zetian) A B O Y", "(Hilda) Baloyskie", "(Claude) KennzyySkie"] }
                 ]  
             },
-            { week: 1, day: "Sabtu, 28 Maret 2026", time: "17:15", t1: "AE", s1: 0, t2: "ONIC", s2: 2, 
+            { week: 1, day: "Sabtu, 4 April 2026", time: "16:00", t1: "AC", s1: null, t2: "FL", s2: null, 
                 games: [
                     { title: "G1", winner: 2, t1Lineup: ["Nino (Lukas)", "Yazukee (Fredrinn)", "Hijumee (Yve)", "Alekk (Hilda)", "Arfy (Claude)"], t2Lineup: ["(Sora) Lutpi", "(Guinevere) Kairi", "(Pharsa) SANZ", "(Chou) Kiboy", "(Yi Sun-Shin) Kelra"] },
                     { title: "G2", winner: 2, t1Lineup: ["Nino (Suyou)", "Yazukee (Joy)", "Hijumee (Zetian)", "Alekk (Khaleed)", "Arfy (Claude)"], t2Lineup: ["(Lapu-Lapu) Lutpi", "(Harley) Kairi", "(Gord) SANZ", "(Chou) Kiboy", "(Yi Sun-Shin) Kelra"] }
@@ -91,7 +90,7 @@
             },
             { week: 1, day: "Sabtu, 28 Maret 2026", time: "20:15", t1: "TLID", s1: 2, t2: "NAVI", s2: 1, 
                 games: [
-                    { title: "G1", winner: 1, t1Lineup: ["Aran (Phoveus)", "Kevinn (Lukas)", "Drichel (Zhuxin)", "Lyoni (Gloo)", "Kyouu (Karrie)"], t2Lineup: ["(Sora) Karss", "(Hayabusa) Andoryuuu", "(Lylia) Uk1r", "(Khaleed) Aprho", "(Freya) Xyve"] },
+                    { title: "G1", winner: 1, t1Lineup: ["Aran (Phoveus)", "Kevinn (Lukas)", "Drichel (Zhuxin)", "Lyoni (Gloo)", "Kyouu (Karrie)"], t2Lineup: ["(Sora) Karss", "(Hayabu) Andoryuuu", "(Lylia) Uk1r", "(Khaleed) Aprho", "(Freya) Xyve"] },
                     { title: "G2", winner: 2, t1Lineup: ["Aran (Benedetta)", "Kevinn (Fredrinn)", "Drichel (Zhuxin)", "Lyoni (Chip)", "Kyouu (Karrie)"], t2Lineup: ["(Sora) Karss", "(Yi Sun-Shin) Andoryuuu", "(Yve) Uk1r", "(Gloo) Aprho", "(Freya) Xyve"] },
                     { title: "G3", winner: 1, t1Lineup: ["Aran (Freya)", "Kevinn (Fredrinn)", "Drichel (Zetian)", "Lyoni (Gloo)", "Kyouu (Moskov)"], t2Lineup: ["(Esmeralda) Karss", "(Suyou) Andoryuuu", "(Zhuxin) Uk1r", "(Khaleed) Aprho", "(Harith) Xyve"] }
                 ] 
