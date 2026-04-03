@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATCH RESULT MPL ID S17</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #020617; color: white; font-family: 'Rajdhani', sans-serif; }
+        .match-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 4px; cursor: pointer; }
+        .week-scroll { display: flex; overflow-x: auto; white-space: nowrap; gap: 8px; padding-bottom: 10px; scrollbar-width: none; }
+        .week-scroll::-webkit-scrollbar { display: none; }
+        .tab-btn { border: 1px solid #1e293b; color: #64748b; transition: 0.3s; font-size: 11px; font-weight: bold; border-radius: 6px; padding: 6px 14px; flex-shrink: 0; }
+        .tab-active { background-color: #eab308; color: #000; border-color: #eab308; box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); }
+        .detail-box { display: none; background: #0f172a; border-top: 2px solid #eab308; }
+        .detail-box.active { display: block; }
+        .game-tab { padding: 4px 8px; font-size: 9px; cursor: pointer; border: 1px solid #334155; color: #94a3b8; border-radius: 3px; }
+        .game-tab.active { border-color: #eab308; color: #eab308; background: rgba(234, 179, 8, 0.1); }
+        .day-header { color: #94a3b8; font-size: 11px; font-weight: 800; letter-spacing: 0.1em; border-left: 3px solid #eab308; padding-left: 8px; margin-top: 20px; margin-bottom: 10px; }
+    </style>
+</head>
+<body class="p-4 pb-20">
+
+    <header class="text-center mb-6 mt-4">
+        <h1 class="text-4xl font-black italic text-yellow-500 uppercase tracking-tighter">MATCH <span class="text-white">RESULT</span></h1>
+        <p class="text-[10px] tracking-[0.4em] text-slate-500 font-bold uppercase mt-1">MPL ID S17 By Renn.</p>
+        <div class="h-1 w-20 bg-yellow-500 mx-auto mt-4 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.4)]"></div>
+    </header>
+
+    <div class="max-w-4xl mx-auto space-y-8">
+        <section>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-4">
+                <h2 class="text-lg font-bold italic text-slate-500 uppercase">Jadwal</h2>
+            </div>
+            <div id="week-nav" class="week-scroll"></div>
+            <div id="schedule-container" class="space-y-1 mt-2"></div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-bold italic text-slate-500 border-b border-slate-800 mb-4 uppercase">Peringkat</h2>
+            <div class="bg-[#0f172a] rounded border border-slate-800 overflow-x-auto">
+                <table class="w-full text-center min-w-[500px]">
+                    <thead>
+                        <tr class="bg-slate-900/50 uppercase text-[9px] text-slate-400 font-bold">
+                            <th class="p-3">#</th>
+                            <th class="p-3 text-left text-white">Team</th>
+                            <th class="p-3 text-yellow-500">PTS</th>
+                            <th class="p-3 border-l border-slate-800">Match W-L</th>
+                            <th class="p-3 border-l border-slate-800 text-yellow-500">Net Game</th>
+                            <th class="p-3 border-l border-slate-800 font-normal">Game W-L</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standings-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // DAFTAR TIM (Sesuaikan dengan tim yang ikut liga Anda)
+        const teams = ["RRQ", "EVOS", "ONIC", "AE", "BTR", "GEEK", "TLID", "DEWA", "NAVI"];
+
+        // DATA MANUAL - Silakan Edit di Sini
+        const matchData = [
+            // --- WEEK 1 ---
+            { week: 1, day: "Jumat, 27 Maret 2026", time: "15:15", t1: "BTR", s1: 2, t2: "AE", s2: 1, 
+                games: [
+                    { title: "G1", winner: 1, t1Lineup: ["Shogun (Phoveus)", "Nnael (Leomord)", "Morenooo (Yve)", "Finn (Gloo)", "Emann (Claude)"], t2Lineup: ["(Sora) Nino", "(Uranus) Yazukee", "(Valentina) Hijumee", "(Hylos) Alekk", "(Yi Sun-Shin) Arfy"] },
+                    { title: "G2", winner: 2, t1Lineup: ["Shogun (Sora)", "Nnael (Fredrinn)", "Morenooo (Lylia)", "Finn (Khaleed)", "Emann (Granger)"], t2Lineup: ["(Phoveus) Nino", "(Suyou) Yazukee", "(Zetian) Hijumee", "(Marcel) Alekk", "(Obsidia) Arfy"] },
+                    { title: "G3", winner: 1, t1Lineup: ["Shogun (Uranus)", "Nnael (Leomord)", "Morenooo (Yve)", "Finn (Hylos)", "Emann (Freya)"], t2Lineup: ["(Lapu-Lapu) Nino", "(Guinevere) Yazukee", "(Valentina) Hijumee", "(Chou) Alekk", "(Yi Sun-Shin) Arfy"] }
+                ] 
+            },
+            { week: 1, day: "Jumat, 27 Maret 2026", time: "18:15", t1: "NAVI", s1: 2, t2: "RRQ", s2: 0, 
+                games: [
+                    { title: "G1", winner: 1, t1Lineup: ["Karss (Lapu-Lapu)", "Andoryuuu (Leomord)", "Uk1r (Faramis)", "Aprho (Marcel)", "Xyve (Harith)"], t2Lineup: ["(Uranus) SuperDann", "(Fredrinn) SuperKenn", "(Zetian) Rinz", "(Khaleed) Idok", "(Obsidia) SuperToYy"] },
+                    { title: "G2", winner: 1, t1Lineup: ["Karss (Phoveus)", "Andoryuuu (Yi Sun-Shin)", "Uk1r (Lylia)", "Aprho (Belerick)", "Xyve (Harley)"], t2Lineup: ["(Alice) SuperDann", "(Leomord) SuperKenn", "(Valentina) Rinz", "(Marcel) Idok", "(Claude) SuperToYy"] }
+                ] 
+            },
+            { week: 1, day: "Sabtu, 28 Maret 2026", time: "14:15", t1: "EVOS", s1: 2, t2: "GEEK", s2: 0, 
+                games: [
+                    { title: "G1", winner: 1, t1Lineup: ["Luke (Valentina)", "Alberttt (Fanny)", "Treacky (Selena)", "Kyy (Gatot Kaca)", "Erlan (Claude)"], t2Lineup: ["(Cici) marceL", "(Fredrinn) Maykids", "(Kimmy) A B O Y", "(Hilda) Baloyskie", "(Sora) KennzyySkie"] },
+                    { title: "G2", winner: 1, t1Lineup: ["Luke (Masha)", "Alberttt (Fredrinn)", "Treacky (Pharsa)", "Kyy (Chip)", "Erlan (Granger)"], t2Lineup: ["(X.Borg) marceL", "(Suyou) Maykids", "(Zetian) A B O Y", "(Hilda) Baloyskie", "(Claude) KennzyySkie"] }
+                ]  
+            },
+            { week: 1, day: "Sabtu, 28 Maret 2026", time: "17:15", t1: "AE", s1: 0, t2: "ONIC", s2: 2, 
+                games: [
+                    { title: "G1", winner: 2, t1Lineup: ["Nino (Lukas)", "Yazukee (Fredrinn)", "Hijumee (Yve)", "Alekk (Hilda)", "Arfy (Claude)"], t2Lineup: ["(Sora) Lutpi", "(Guinevere) Kairi", "(Pharsa) SANZ", "(Chou) Kiboy", "(Yi Sun-Shin) Kelra"] },
+                    { title: "G2", winner: 2, t1Lineup: ["Nino (Suyou)", "Yazukee (Joy)", "Hijumee (Zetian)", "Alekk (Khaleed)", "Arfy (Claude)"], t2Lineup: ["(Lapu-Lapu) Lutpi", "(Harley) Kairi", "(Gord) SANZ", "(Chou) Kiboy", "(Yi Sun-Shin) Kelra"] }
+                ] 
+            },
+            { week: 1, day: "Sabtu, 28 Maret 2026", time: "20:15", t1: "TLID", s1: 2, t2: "NAVI", s2: 1, 
+                games: [
+                    { title: "G1", winner: 1, t1Lineup: ["Aran (Phoveus)", "Kevinn (Lukas)", "Drichel (Zhuxin)", "Lyoni (Gloo)", "Kyouu (Karrie)"], t2Lineup: ["(Sora) Karss", "(Hayabusa) Andoryuuu", "(Lylia) Uk1r", "(Khaleed) Aprho", "(Freya) Xyve"] },
+                    { title: "G2", winner: 2, t1Lineup: ["Aran (Benedetta)", "Kevinn (Fredrinn)", "Drichel (Zhuxin)", "Lyoni (Chip)", "Kyouu (Karrie)"], t2Lineup: ["(Sora) Karss", "(Yi Sun-Shin) Andoryuuu", "(Yve) Uk1r", "(Gloo) Aprho", "(Freya) Xyve"] },
+                    { title: "G3", winner: 1, t1Lineup: ["Aran (Freya)", "Kevinn (Fredrinn)", "Drichel (Zetian)", "Lyoni (Gloo)", "Kyouu (Moskov)"], t2Lineup: ["(Esmeralda) Karss", "(Suyou) Andoryuuu", "(Zhuxin) Uk1r", "(Khaleed) Aprho", "(Harith) Xyve"] }
+                ] 
+            },
+
+            { week: 1, day: "Minggu, 29 Maret 2026", time: "14:15", t1: "DEWA", s1: 2, t2: "BTR", s2: 0, 
+                games: [
+                    { title: "G1", winner: 1, t1Lineup: ["QINN (Arlott)", "Dolynn (Fanny)", "Octa (Pharsa)", "Muezza (Guinevere)", "Maybeee (Freya)"], t2Lineup: ["(Sora) Lynch", "(Leomord) Nnael", "(Valentina) Ryzaa", "(Badang) Finn", "(Yi Sun-Shin) Cliveee"] },
+                    { title: "G2", winner: 1, t1Lineup: ["QINN (Arlott)", "Dolynn (Guinevere)", "Octa (Pharsa)", "Muezza (Gloo)", "Maybeee (Claude)"], t2Lineup: ["(Sora) Lynch", "(Lancelot) Nnael", "(Zetian) Ryzaa", "(Hylos) Finn", "(Yi Sun-Shin) Cliveee"] }
+                ]  
+            },
+            { week: 1, day: "Minggu, 29 Maret 2026", time: "17:15", t1: "EVOS", s1: 0, t2: "TLID", s2: 2, 
+                games: [
+                    { title: "G1", winner: 2, t1Lineup: ["Luke (Gloo)", "Alberttt (Fanny)", "Treacky (Selena)", "EgaTzy (Gatot Kaca)", "Erlan (Claude)"], t2Lineup: ["(Yu Zhong) Aran", "(Leomord) Kevinn", "(Zhuxin) Drichel", "(Hilda) Lyoni", "(Moskov) Kyouu"] },
+                    { title: "G2", winner: 2, t1Lineup: ["Luke (Valentina)", "Alberttt (Suyou)", "Treacky (Kimmy)", "EgaTzy (Chou)", "Erlan (Cici)"], t2Lineup: ["(Sora) Aran", "(Fredrinn) Kevinn", "(Yve) Drichel", "(Gloo) Lyoni", "(Karrie) Kyouu"] }
+                ]  
+            },
+            { week: 1, day: "Minggu, 29 Maret 2026", time: "20:15", t1: "RRQ", s1: 0, t2: "ONIC", s2: 2, 
+                games: [
+                    { title: "G1", winner: 2, t1Lineup: ["SuperDann (Uranus)", "Superkenn (Harley)", "Yehezkiel (Zetian)", "Idok (Grock)", "SuperToYy (Bruno)"], t2Lineup: ["(Yu Zhong) Lutpi", "(Suyou) Kairi", "(Zhuxin) SANZ", "(Badang) Kiboy", "(Harith) Kelra"] },
+                    { title: "G2", winner: 2, t1Lineup: ["SuperDann (Phoveus)", "Superkenn (Suyou)", "Yehezkiel (Lylia)", "Idok (Kalea)", "SuperToYy (Karrie)"], t2Lineup: ["(Sora) Lutpi", "(Guinevere) Kairi", "(Yve) SANZ", "(Gatot Kaca) Kiboy", "(Granger) Kelra"] }
+                ]
+            },
+
+            // --- WEEK 2 (Contoh Kosongan) ---
+            { week: 2, day: "Jumat, 3 April 2026", time: "15:15", t1: "ONIC", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Jumat, 3 April 2026", time: "18:15", t1: "DEWA", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Sabtu, 4 April 2026", time: "14:15", t1: "GEEK", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Sabtu, 4 April 2026", time: "17:15", t1: "AE", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Sabtu, 4 April 2026", time: "20:15", t1: "TLID", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Minggu, 5 April 2026", time: "14:15", t1: "NAVI", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Minggu, 5 April 2026", time: "17:15", t1: "RRQ", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 2, day: "Minggu, 5 April 2026", time: "20:15", t1: "BTR", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 3 ---
+            { week: 3, day: "Jumat, 10 April 2026", time: "15:15", t1: "ONIC", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Jumat, 10 April 2026", time: "18:15", t1: "NAVI", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Sabtu, 11 April 2026", time: "14:15", t1: "TLID", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Sabtu, 11 April 2026", time: "17:15", t1: "ONIC", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Sabtu, 11 April 2026", time: "20:15", t1: "RRQ", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Minggu, 12 April 2026", time: "14:15", t1: "BTR", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Minggu, 12 April 2026", time: "17:15", t1: "GEEK", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 3, day: "Minggu, 12 April 2026", time: "20:15", t1: "AE", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 4 ---
+            { week: 4, day: "Jumat, 17 April 2026", time: "15:15", t1: "NAVI", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Jumat, 17 April 2026", time: "18:15", t1: "EVOS", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Sabtu, 18 April 2026", time: "14:15", t1: "TLID", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Sabtu, 18 April 2026", time: "17:15", t1: "RRQ", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Sabtu, 18 April 2026", time: "20:15", t1: "GEEK", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Minggu, 19 April 2026", time: "14:15", t1: "ONIC", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Minggu, 19 April 2026", time: "17:15", t1: "BTR", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 4, day: "Minggu, 19 April 2026", time: "20:15", t1: "DEWA", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 5 ---
+            { week: 5, day: "Jumat, 24 April 2026", time: "15:15", t1: "GEEK", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Jumat, 24 April 2026", time: "18:15", t1: "EVOS", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Sabtu, 25 April 2026", time: "14:15", t1: "DEWA", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Sabtu, 25 April 2026", time: "17:15", t1: "AE", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Sabtu, 25 April 2026", time: "20:15", t1: "EVOS", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Minggu, 26 April 2026", time: "14:15", t1: "AE", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Minggu, 26 April 2026", time: "17:15", t1: "GEEK", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 5, day: "Minggu, 26 April 2026", time: "20:15", t1: "DEWA", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 6 ---
+            { week: 6, day: "Jumat, 1 Mei 2026", time: "15:15", t1: "NAVI", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Jumat, 1 Mei 2026", time: "18:15", t1: "AE", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Sabtu, 2 Mei 2026", time: "14:15", t1: "EVOS", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Sabtu, 2 Mei 2026", time: "17:15", t1: "TLID", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Sabtu, 2 Mei 2026", time: "20:15", t1: "RRQ", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Minggu, 3 Mei 2026", time: "14:15", t1: "NAVI", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Minggu, 3 Mei 2026", time: "17:15", t1: "ONIC", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 6, day: "Minggu, 3 Mei 2026", time: "20:15", t1: "GEEK", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 7 ---
+            { week: 7, day: "Jumat, 8 Mei 2026", time: "15:15", t1: "GEEK", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Jumat, 8 Mei 2026", time: "18:15", t1: "BTR", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Sabtu, 9 Mei 2026", time: "14:15", t1: "DEWA", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Sabtu, 9 Mei 2026", time: "17:15", t1: "EVOS", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Sabtu, 9 Mei 2026", time: "20:15", t1: "ONIC", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Minggu, 10 Mei 2026", time: "14:15", t1: "RRQ", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Minggu, 10 Mei 2026", time: "17:15", t1: "NAVI", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 7, day: "Minggu, 10 Mei 2026", time: "20:15", t1: "TLID", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 8 ---
+            { week: 8, day: "Jumat, 15 Mei 2026", time: "15:15", t1: "BTR", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Jumat, 15 Mei 2026", time: "18:15", t1: "DEWA", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Sabtu, 16 Mei 2026", time: "14:15", t1: "EVOS", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Sabtu, 16 Mei 2026", time: "17:15", t1: "TLID", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Sabtu, 16 Mei 2026", time: "20:15", t1: "ONIC", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Minggu, 17 Mei 2026", time: "14:15", t1: "DEWA", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Minggu, 17 Mei 2026", time: "17:15", t1: "AE", s1: null, t2: "BTR", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 8, day: "Minggu, 17 Mei 2026", time: "20:15", t1: "RRQ", s1: null, t2: "NAVI", s2: null, 
+                games: [
+                ] 
+            },
+    
+            // --- WEEK 9 ---
+            { week: 9, day: "Jumat, 22 Mei 2026", time: "15:15", t1: "BTR", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Jumat, 22 Mei 2026", time: "18:15", t1: "TLID", s1: null, t2: "AE", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Sabtu, 23 Mei 2026", time: "14:15", t1: "GEEK", s1: null, t2: "TLID", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Sabtu, 23 Mei 2026", time: "17:15", t1: "AE", s1: null, t2: "RRQ", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Sabtu, 23 Mei 2026", time: "20:15", t1: "BTR", s1: null, t2: "ONIC", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Minggu, 24 Mei 2026", time: "14:15", t1: "RRQ", s1: null, t2: "DEWA", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Minggu, 24 Mei 2026", time: "17:15", t1: "ONIC", s1: null, t2: "EVOS", s2: null, 
+                games: [
+                ] 
+            },
+            { week: 9, day: "Minggu, 24 Mei 2026", time: "20:15", t1: "NAVI", s1: null, t2: "GEEK", s2: null, 
+                games: [
+                ] 
+            },
+            // ... Tambahkan match lain sesuai format di atas
+        ];
+
+        let currentViewWeek = 1;
+
+        function toggleDetail(id) {
+            const el = document.getElementById(id);
+            if(el) el.classList.toggle('active');
+        }
+
+        function changeGameTab(mIdx, gIdx) {
+            document.querySelectorAll(`.gt-${mIdx}`).forEach(t => t.classList.remove('active'));
+            document.querySelectorAll(`.gc-${mIdx}`).forEach(c => c.classList.add('hidden'));
+            document.getElementById(`tab-${mIdx}-${gameIdx}`).classList.add('active'); // Perbaikan: gIdx bukan gameIdx
+            document.getElementById(`content-${mIdx}-${gameIdx}`).classList.remove('hidden');
+        }
+        // Fungsi perbaikan karena ada typo di atas
+        function changeGameTabFixed(mIdx, gIdx) {
+            document.querySelectorAll(`.gt-${mIdx}`).forEach(t => t.classList.remove('active'));
+            document.querySelectorAll(`.gc-${mIdx}`).forEach(c => c.classList.add('hidden'));
+            document.getElementById(`tab-${mIdx}-${gIdx}`).classList.add('active');
+            document.getElementById(`content-${mIdx}-${gIdx}`).classList.remove('hidden');
+        }
+
+        function render() {
+            const weeks = [...new Set(matchData.map(m => m.week))];
+            document.getElementById('week-nav').innerHTML = weeks.map(w => `
+                <button onclick="currentViewWeek=${w}; render()" class="tab-btn ${currentViewWeek == w ? 'tab-active' : ''}">WEEK ${w}</button>
+            `).join('');
+
+            const scheduleContainer = document.getElementById('schedule-container');
+            const filteredMatch = matchData.filter(m => m.week === currentViewWeek);
+            const days = [...new Set(filteredMatch.map(m => m.day))];
+            
+            scheduleContainer.innerHTML = days.map(day => {
+                const matchesOnDay = filteredMatch.filter(m => m.day === day);
+                return `
+                    <div class="day-header uppercase">${day}</div>
+                    ${matchesOnDay.map((m) => {
+                        const globalIdx = matchData.indexOf(m);
+                        const isFinal = m.s1 !== null && m.s2 !== null;
+                        const gameTabs = m.games?.map((g, gIdx) => `
+                            <div id="tab-${globalIdx}-${gIdx}" class="game-tab gt-${globalIdx} ${gIdx === 0 ? 'active' : ''}" onclick="event.stopPropagation(); changeGameTabFixed(${globalIdx}, ${gIdx})">${g.title}</div>
+                        `).join('') || "";
+
+                        const gameContents = m.games?.map((g, gIdx) => `
+                            <div id="content-${globalIdx}-${gIdx}" class="gc-${globalIdx} ${gIdx !== 0 ? 'hidden' : ''} grid grid-cols-2 gap-4 mt-4">
+                                <div class="text-[10px]"><p class="${g.winner===1?'text-yellow-500 font-bold':'text-slate-500'}">${g.winner===1?'👑 WINNER':'DEFEAT'}</p>
+                                    <ul class="mt-1">${g.t1Lineup?.map(p=>`<li>• ${p}</li>`).join('') || ""}</ul>
+                                </div>
+                                <div class="text-[10px] text-right border-l border-slate-800 pl-4"><p class="${g.winner===2?'text-yellow-500 font-bold':'text-slate-500'}">${g.winner===2?'WINNER 👑':'DEFEAT'}</p>
+                                    <ul class="mt-1">${g.t2Lineup?.map(p=>`<li>${p} •</li>`).join('') || ""}</ul>
+                                </div>
+                            </div>
+                        `).join('') || "<p class='text-[9px] text-slate-600 p-2 text-center italic'>Belum ada data game.</p>";
+
+                        return `
+                            <div class="overflow-hidden rounded border border-slate-800 mb-2">
+                                <div class="match-card p-3 flex items-center justify-between" onclick="toggleDetail('detail-${globalIdx}')">
+                                    <div class="flex-1 text-right font-bold uppercase text-sm ${isFinal && m.s1 > m.s2 ? 'text-yellow-500' : 'text-white'}">${m.t1}</div>
+                                    <div class="px-4 text-center min-w-[70px]">
+                                        ${isFinal ? `<span class="text-lg font-black italic tracking-tighter">${m.s1}-${m.s2}</span>` : `<span class="text-[10px] text-slate-500">${m.time}</span>`}
+                                    </div>
+                                    <div class="flex-1 text-left font-bold uppercase text-sm ${isFinal && m.s2 > m.s1 ? 'text-yellow-500' : ''}">${m.t2}</div>
+                                </div>
+                                <div id="detail-${globalIdx}" class="detail-box p-4">
+                                    <div class="flex gap-2 border-b border-slate-800 pb-2">${gameTabs}</div>
+                                    ${gameContents}
+                                </div>
+                            </div>`;
+                    }).join('')}
+                `;
+            }).join('');
+
+            let stats = teams.reduce((acc, t) => { acc[t] = { name: t, mW: 0, mL: 0, mPts: 0, gW: 0, gL: 0, netG: 0 }; return acc; }, {});
+            matchData.forEach(m => {
+                if (m.s1 !== null && m.s2 !== null) {
+                    stats[m.t1].gW += m.s1; stats[m.t1].gL += m.s2; stats[m.t2].gW += m.s2; stats[m.t2].gL += m.s1;
+                    stats[m.t1].netG += (m.s1 - m.s2); stats[m.t2].netG += (m.s2 - m.s1);
+                    if (m.s1 > m.s2) { stats[m.t1].mW++; stats[m.t1].mPts++; stats[m.t2].mL++; } 
+                    else { stats[m.t2].mW++; stats[m.t2].mPts++; stats[m.t1].mL++; }
+                }
+            });
+
+            const sorted = Object.values(stats).sort((a, b) => {
+                if (b.mPts !== a.mPts) return b.mPts - a.mPts;
+                if (b.mW !== a.mW) return b.mW - a.mW;
+                if (b.netG !== a.netG) return b.netG - a.netG;
+                return b.gW - a.gW;
+            });
+
+            document.getElementById('standings-body').innerHTML = sorted.map((t, i) => `
+                <tr class="border-t border-slate-800/50">
+                    <td class="p-3 font-bold italic ${i==0?'text-yellow-500':''}">${i + 1}</td>
+                    <td class="p-3 font-bold text-left uppercase text-xs">${t.name}</td>
+                    <td class="p-3 text-yellow-500 font-black">${t.mPts}</td>
+                    <td class="p-3 text-[10px] border-l border-slate-800/30">${t.mW}-${t.mL}</td>
+                    <td class="p-3 font-bold text-xs border-l border-slate-800/30 ${t.netG >= 0 ? 'text-green-500' : 'text-red-500'}">${t.netG}</td>
+                    <td class="p-3 text-[10px] border-l border-slate-800/30">${t.gW}-${t.gL}</td>
+                </tr>`).join('');
+        }
+        render();
+    </script>
+</body>
+</html>
